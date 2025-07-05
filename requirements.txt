@@ -1,0 +1,12 @@
+flask
+scapy
+requests
+numpy
+scikit-learn
+geoip2
+fastapi
+uvicorn
+jinja2
+pandas
+# Optional dependencies for additional functionality
+matplotlib  # For plotting and visualization

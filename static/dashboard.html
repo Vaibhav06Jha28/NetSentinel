@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NetSentinel Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Same CSS as before */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #0d1117;
+      color: #c9d1d9;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      flex: 2;
+      padding: 20px;
+      background: #161b22;
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      flex: 1;
+      padding: 20px;
+      background: #161b22;
+      border-left: 1px solid #30363d;
+      overflow-y: auto;
+    }
+
+    h2, h3 {
+      color: #58a6ff;
+      margin-top: 0;
+    }
+
+    canvas {
+      width: 100% !important;
+      max-height: 320px !important;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #30363d;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #21262d;
+      color: #ffffff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #1c2128;
+    }
+
+    tr:hover {
+      background-color: #2e3440;
+    }
+
+    .flag {
+      width: 24px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      margin: 5px 5px 10px 0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2ea043;
+    }
+
+    input, select {
+      padding: 8px;
+      margin: 8px 5px 15px 0;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      background-color: #0d1117;
+      color: white;
+    }
+
+    .section {
+      background: #1c2128;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      border: 1px solid #30363d;
+    }
+
+    ul#alertList {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    ul#alertList li {
+      background: #3b0a0a;
+      color: #ff7b72;
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    .collapsible h3 {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .collapsible .content {
+      display: block;
+    }
+
+    .collapsible.collapsed .content {
+      display: none;
+    }
+
+    .collapsible h3::after {
+      content: "\25BC";
+      transition: transform 0.3s ease;
+      font-size: 12px;
+    }
+
+    .collapsible.collapsed h3::after {
+      transform: rotate(-90deg);
+    }
+
+    .badge {
+      padding: 2px 6px;
+      font-size: 12px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .badge-danger {
+      background-color: #ff4d4f;
+      color: white;
+    }
+
+    .badge-ai {
+      background-color: #ff9900;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="left-panel">
+    <h2>📊 Traffic Overview</h2>
+    <canvas id="packetChart"></canvas>
+
+    <h2 style="margin-top:20px;">🌍 Country-wise Traffic</h2>
+    <canvas id="countryChart"></canvas>
+
+    <h2 style="margin-top:20px;">🧾 Live Packet List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Src IP</th>
+          <th>Country</th>
+          <th>Dst IP</th>
+          <th>Proto</th>
+          <th>Len</th>
+          <th>Direction</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="livePackets"></tbody>
+    </table>
+  </div>
+
+  <div class="right-panel">
+    <h3>⚙️ Filters</h3>
+    <button onclick="toggleTCP()">Toggle TCP</button>
+    <button onclick="toggleExternal()">Toggle External</button>
+    <input type="text" id="searchIP" placeholder="🔍 Search IP..." onkeyup="filterTable()" />
+    <select id="protocolFilter" onchange="filterTable()">
+      <option value="">All Protocols</option>
+      <option value="TCP">TCP</option>
+      <option value="UDP">UDP</option>
+      <option value="ICMP">ICMP</option>
+    </select>
+
+    <button onclick="simulateMaliciousIP()">🧪 Simulate Malicious IP</button>
+
+    <div class="section collapsible" id="alertSection">
+      <h3 onclick="toggleCollapse('alertSection')">🚨 Anomaly Alerts</h3>
+      <div class="content">
+        <ul id="alertList"></ul>
+      </div>
+    </div>
+
+    <div class="section collapsible" id="ruleSection">
+      <h3 onclick="toggleCollapse('ruleSection')">🛡️ Intrusion Detection Rules</h3>
+      <div class="content">
+        <form method="post" action="/add_rule">
+          <select name="field">
+            <option value="src">Source IP</option>
+            <option value="dst">Destination IP</option>
+            <option value="proto">Protocol</option>
+            <option value="app_proto">App Protocol</option>
+            <option value="length">Packet Length</option>
+          </select>
+          <select name="operator">
+            <option value="==">==</option>
+            <option value="!=">!=</option>
+            <option value=">">&gt;</option>
+            <option value="<">&lt;</option>
+          </select>
+          <input type="text" name="value" placeholder="Value" required>
+          <input type="text" name="message" placeholder="Message" required>
+          <button type="submit">Add Rule</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const username = "Vaibhav"; // 👈 You can fetch this dynamically in future
+const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/packets?username=${encodeURIComponent(username)}`);
+
+let incoming = 0, outgoing = 0;
+let countryCounts = {}, packetList = [], alerts = [];
+
+const packetChart = new Chart(document.getElementById("packetChart"), {
+  type: 'bar',
+  data: {
+    labels: ['Incoming', 'Outgoing'],
+    datasets: [{
+      label: 'Packets',
+      data: [0, 0],
+      backgroundColor: ['#ff6b6b', '#4d96ff']
+    }]
+  },
+  options: {
+    animation: { duration: 1000 },
+    scales: {
+      x: { ticks: { color: '#c9d1d9' } },
+      y: { ticks: { color: '#c9d1d9' } }
+    },
+    plugins: {
+      legend: { labels: { color: '#c9d1d9' } }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+const countryChart = new Chart(document.getElementById("countryChart"), {
+  type: 'bar',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Packets by Country',
+      data: [],
+      backgroundColor: 'rgba(0, 204, 153, 0.6)'
+    }]
+  },
+  options: {
+    animation: { duration: 1000 },
+    scales: {
+      x: { ticks: { color: '#c9d1d9', font: { size: 11 } } },
+      y: { ticks: { color: '#c9d1d9' } }
+    },
+    plugins: {
+      legend: { labels: { color: '#c9d1d9' } }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+ws.onmessage = (event) => {
+  const p = JSON.parse(event.data);
+  if (p.is_incoming) incoming++; else outgoing++;
+  packetChart.data.datasets[0].data = [incoming, outgoing];
+  packetChart.update();
+
+  const country = p.country_src || "Unknown";
+  countryCounts[country] = (countryCounts[country] || 0) + 1;
+
+  packetList.unshift(p);
+  if (packetList.length > 20) packetList.pop();
+
+  if (p.alert_message) {
+    let aiLabel = p.alert_message.includes("AI") ? " 🧠" : "";
+    alerts.unshift(`<li><b>${p.timestamp}</b> — ${p.src}${aiLabel} → <i>${p.alert_message}</i></li>`);
+    if (alerts.length > 20) alerts.pop();
+    document.getElementById("alertList").innerHTML = alerts.join('');
+  }
+};
+
+setInterval(() => {
+  const sorted = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+  const countryLabels = sorted.map(([k]) => k);
+  const countryValues = sorted.map(([, v]) => v);
+  countryChart.data.labels = countryLabels;
+  countryChart.data.datasets[0].data = countryValues;
+  countryChart.update();
+
+  const table = document.getElementById("livePackets");
+  table.innerHTML = "";
+  packetList.forEach(p => {
+    const code = (p.country_code_src || 'xx').toLowerCase();
+    const flag = `<img class='flag' src='https://flagcdn.com/24x18/${code}.png'/>`;
+    const direction = p.is_incoming ? "⬅️ Incoming" : "➡️ Outgoing";
+
+    let alertBadge = "";
+    if (p.alert_message?.includes("AI")) {
+      alertBadge = `<span class="badge badge-ai" title="Anomaly Detected by ML Model">AI</span>`;
+    } else if (p.alert_message?.includes("Blocked") || p.alert_message?.includes("Malicious")) {
+      alertBadge = `<span class="badge badge-danger" title="${p.alert_message}">⚠️</span>`;
+    }
+
+    table.innerHTML += `<tr>
+      <td>${p.src} ${alertBadge}</td>
+      <td>${flag} ${p.country_src || 'Unknown'}</td>
+      <td>${p.dst}</td>
+      <td>${p.proto}</td>
+      <td>${p.length}</td>
+      <td>${direction}</td>
+      <td>
+        <button onclick="blockIP('${p.src}')">🚫 Block</button>
+        <button onclick="trustIP('${p.src}')">✅ Trust</button>
+      </td>
+    </tr>`;
+  });
+}, 1000);
+
+function toggleTCP() { fetch("/toggle_tcp").then(() => location.reload()); }
+function toggleExternal() { fetch("/toggle_external").then(() => location.reload()); }
+
+function filterTable() {
+  const ipInput = document.getElementById("searchIP").value.toLowerCase();
+  const proto = document.getElementById("protocolFilter").value;
+  const rows = document.querySelectorAll("table tbody tr");
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    const src = cells[0]?.textContent.toLowerCase();
+    const dst = cells[2]?.textContent.toLowerCase();
+    const protoCell = cells[3]?.textContent;
+    const matchesIP = src.includes(ipInput) || dst.includes(ipInput);
+    const matchesProto = proto === "" || protoCell === proto;
+    row.style.display = matchesIP && matchesProto ? "" : "none";
+  });
+}
+
+function toggleCollapse(id) {
+  const section = document.getElementById(id);
+  section.classList.toggle("collapsed");
+}
+
+function blockIP(ip) {
+  if (confirm(`Block IP: ${ip}?`)) {
+    fetch('/block_ip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ip })
+    }).then(res => {
+      if (res.ok) alert(`✅ Blocked ${ip}`);
+      else alert(`❌ Failed to block ${ip}`);
+    });
+  }
+}
+
+function trustIP(ip) {
+  if (confirm(`Trust IP: ${ip}?`)) {
+    fetch('/trust_ip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ip })
+    }).then(res => {
+      if (res.ok) alert(`✅ Trusted ${ip}`);
+      else alert(`❌ Failed to trust ${ip}`);
+    });
+  }
+}
+
+function simulateMaliciousIP() {
+  fetch("/simulate_malicious_ip", { method: "POST" })
+    .then(res => {
+      if (res.ok) alert("✅ Simulated malicious packet injected!");
+      else alert("❌ Failed to simulate malicious IP.");
+    });
+}
+</script>
+</body>
+</html>
+
