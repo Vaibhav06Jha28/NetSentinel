@@ -217,7 +217,20 @@ def handle_packet(packet: dict):
 
 # === Start Sniffer Thread ===
 # Use simulate_traffic if running in Railway (no live interface access)
-Thread(target=start_sniffing, daemon=True).start()
+def is_cloud_env():
+    return os.getenv("PORT") is not None  # Railway sets PORT
+
+try:
+    if is_cloud_env():
+        from simulate_traffic import start_simulation
+        print("🚀 Running in cloud mode — using simulated traffic.")
+        Thread(target=start_simulation, daemon=True).start()
+    else:
+        print("💻 Running locally — using real packet sniffing.")
+        Thread(target=start_sniffing, daemon=True).start()
+except Exception as e:
+    print(f"[❌] Failed to start traffic source: {e}")
+
 
 # === Run App (For local only — Railway won't use this block) ===
 if __name__ == "__main__":
