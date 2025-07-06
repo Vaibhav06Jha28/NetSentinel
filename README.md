@@ -159,18 +159,27 @@ WebSocket Push
 Live Dashboard (JS/HTML)
 ```
 
----
+
 
 ## 🧠 Tech Stack & Tools Used
 
-| Layer          | Technology / Tool          |
-| -------------- | -------------------------- |
-| Packet Capture | Scapy                      |
-| Backend API    | FastAPI, WebSocket         |
-| Anomaly Model  | Isolation Forest (sklearn) |
-| GeoIP Lookup   | MaxMind GeoLite2           |
-| Frontend       | HTML, JavaScript, Chart.js |
-| Deployment     | Docker (optional)          |
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-0ba360?logo=fastapi)
+![WebSocket](https://img.shields.io/badge/WebSocket-RealTime-49BEB7)
+![Scapy](https://img.shields.io/badge/Scapy-PacketCapture-6f42c1)
+![Scikit-learn](https://img.shields.io/badge/IsolationForest-ML-orange?logo=scikit-learn)
+![GeoIP](https://img.shields.io/badge/GeoIP-MaxMind-8e44ad)
+![Chart.js](https://img.shields.io/badge/Chart.js-Frontend-ff6384?logo=chartdotjs)
+![Docker](https://img.shields.io/badge/Docker-Optional-blue?logo=docker)
+
+| Layer         | Technology / Tool        |
+|---------------|---------------------------|
+| Packet Capture| Scapy                     |
+| Backend API   | FastAPI, WebSocket        |
+| Anomaly Model | Isolation Forest (sklearn)|
+| GeoIP Lookup  | MaxMind GeoLite2          |
+| Frontend      | HTML, JavaScript, Chart.js|
+| Deployment    | Docker (optional)         |
 
 ---
 
@@ -179,7 +188,7 @@ Live Dashboard (JS/HTML)
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/netsentinel.git
+git clone https://github.com/Vaibhav06Jha28/netsentinel.git
 cd netsentinel
 ```
 
@@ -268,12 +277,27 @@ Edit `docker-compose.yml` for port/mount settings.
 
 ## 🖼️ Demo Screenshots
 
-* 📊 Real-time dashboard (incoming/outgoing)
-* 🧠 ML anomaly detection
-* 🌍 Country-wise GeoIP chart
-* 🔔 Alerts & top IP stats
+### 📊 Real-Time Dashboard
+![Dashboard](static/assets/Dashboard.png)
 
-*(Add images in `static/assets/` and embed here)*
+### 🔔 Alert System
+![Alerts](static/assets/Alerts.png)
+
+### 🌍 Country-wise IP Chart
+![Country-wise IP](static/assets/Country_wise_IP.png)
+
+### 🧠 Familiar IP Recognition
+![Familiar IP](static/assets/Familiar%20IP.png)
+
+### 🛰️ GeoIP Detection
+![GeoIP](static/assets/GeoIP.png)
+
+### 🌐 Interface Monitor
+![Interface](static/assets/Interface.png)
+
+### 📡 Live IP Stream
+![LiveIP](static/assets/LiveIP.png)
+
 
 ---
 
