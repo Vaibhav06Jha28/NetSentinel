@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, HTMLResponse
@@ -20,7 +20,7 @@ from app.store import packet_data, anomaly_alerts, live_packet_queue
 # === FastAPI Setup ===
 app = FastAPI()
 
-# Serve static folder
+# Serve static folder (unchanged)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # === Root route (serves dashboard.html) ===
@@ -216,10 +216,10 @@ def handle_packet(packet: dict):
             asyncio.run(push_packet_to_clients(packet))
 
 # === Start Sniffer Thread ===
+# Use simulate_traffic if running in Railway (no live interface access)
 Thread(target=start_sniffing, daemon=True).start()
 
-# === Run App ===
+# === Run App (For local only — Railway won't use this block) ===
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-

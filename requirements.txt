@@ -10,3 +10,13 @@ jinja2
 pandas
 # Optional dependencies for additional functionality
 matplotlib  # For plotting and visualization
+fastapi
+uvicorn
+python-multipart
+geoip2
+scapy
+pymongo
+joblib
+numpy
+scikit-learn
+
