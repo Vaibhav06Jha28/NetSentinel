@@ -238,7 +238,9 @@
 
 <script>
 const username = "Vaibhav"; // 👈 You can fetch this dynamically in future
-const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/packets?username=${encodeURIComponent(username)}`);
+const ws = new WebSocket(`wss://${window.location.hostname}/ws/packets?username=${encodeURIComponent(username)}`);
+
+
 
 let incoming = 0, outgoing = 0;
 let countryCounts = {}, packetList = [], alerts = [];
