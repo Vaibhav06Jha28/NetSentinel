@@ -182,6 +182,19 @@ Live Dashboard (JS/HTML)
 | Deployment    | Docker (optional)         |
 
 ---
+# 📡 NetSentinel — Real-Time Network Traffic Analyzer & Threat Detector
+
+[![NetSentinel Live](https://img.shields.io/badge/Live%20Demo-NET_SENTINEL-blue?style=for-the-badge&logo=fastapi)](https://netsentinel-production-1f12.up.railway.app/)
+
+NetSentinel is a real-time full-stack traffic monitoring and intrusion detection system...
+
+## 🚀 Live Deployment
+
+NetSentinel is live and running with simulated packet traffic on Railway.
+
+🔗 Try it here:  
+👉 [https://netsentinel-production-1f12.up.railway.app/](https://netsentinel-production-1f12.up.railway.app/)
+
 
 ## 🚀 Installation & Local Setup
 
