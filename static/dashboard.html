@@ -237,8 +237,10 @@
 </div>
 
 <script>
+const username = "Vaibhav";  // or use prompt() if you want dynamic
 const protocol = location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(`${protocol}://${location.host}/ws/packets?username=${encodeURIComponent(username)}`);
+
 
 
 
