@@ -55,13 +55,13 @@ def generate_packet():
 
 def start_simulation():
     print("🚀 Simulated traffic generator started.")
-    while True:
-        packet = generate_packet()
-        try:
-            asyncio.run(push_packet_to_clients(packet))
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(push_packet_to_clients(packet))
-            loop.close()
-        time.sleep(2)
+
+    async def run_loop():
+        while True:
+            packet = generate_packet()
+            await push_packet_to_clients(packet)
+            await asyncio.sleep(2)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(run_loop())
