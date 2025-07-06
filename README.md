@@ -188,12 +188,23 @@ Live Dashboard (JS/HTML)
 
 NetSentinel is a real-time full-stack traffic monitoring and intrusion detection system...
 
-## 🚀 Live Deployment
+## 🚀 NetSentinel Dashboard
 
-NetSentinel is live and running with simulated packet traffic on Railway.
+[![Live on Railway](https://img.shields.io/badge/Live-Dashboard-green?style=for-the-badge&logo=railway)](https://netsentinel-production-1f12.up.railway.app/)
+[![Deployment Status](https://img.shields.io/badge/Deployed%20on-Railway-blueviolet?style=for-the-badge&logo=railway)](https://railway.app/)
 
-🔗 Try it here:  
-👉 [https://netsentinel-production-1f12.up.railway.app/](https://netsentinel-production-1f12.up.railway.app/)
+> ⚠️ This is a free Railway deployment and may be deleted after 30 days of inactivity.
+
+---
+
+## 🛠️ Deploy Your Own
+
+Click below to deploy NetSentinel to your own Railway account:
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template)
+
+> Replace the template link with your own once you publish a Railway template or guide.
+---
 
 
 ## 🚀 Installation & Local Setup
