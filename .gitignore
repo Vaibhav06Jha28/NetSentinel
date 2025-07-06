@@ -4,3 +4,11 @@ __pycache__/
 *.pkl
 *.mmdb
 .env
+*.db
+*.sqlite3
+*.pyc
+__pycache__/
+*.log
+replace.txt
+rewrite_author.py
+h -f origin main
