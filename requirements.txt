@@ -1,23 +1,25 @@
-uvicorn[standard]
-flask
-scapy
-requests
-numpy
-scikit-learn
-geoip2
+# Core framework
 fastapi
-uvicorn
-jinja2
-pandas
-# Optional dependencies for additional functionality
-matplotlib  # For plotting and visualization
-fastapi
-uvicorn
+uvicorn[standard]  # Includes websockets, h11, httptools etc.
 python-multipart
-geoip2
-scapy
-pymongo
-joblib
-numpy
-scikit-learn
 
+# Web dependencies
+flask
+jinja2
+requests
+
+# Networking
+scapy
+geoip2
+
+# ML & data
+numpy
+pandas
+scikit-learn
+joblib
+
+# Optional visualization
+matplotlib
+
+# Database (if used)
+pymongo
