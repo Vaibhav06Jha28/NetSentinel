@@ -237,8 +237,9 @@
 </div>
 
 <script>
-const username = "Vaibhav"; // 👈 You can fetch this dynamically in future
-const ws = new WebSocket(`wss://${window.location.hostname}/ws/packets?username=${encodeURIComponent(username)}`);
+const protocol = location.protocol === "https:" ? "wss" : "ws";
+const ws = new WebSocket(`${protocol}://${window.location.host}/ws/packets?username=${encodeURIComponent(username)}`);
+
 
 
 
