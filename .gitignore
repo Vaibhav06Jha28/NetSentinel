@@ -1,8 +1,7 @@
 venv/
 __pycache__/
 *.pyc
-*.pkl
-*.mmdb
+
 .env
 *.db
 *.sqlite3
