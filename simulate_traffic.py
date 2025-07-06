@@ -22,6 +22,8 @@ def generate_packet():
     country_code_src, country_src = random.choice(countries)
     country_code_dst, country_dst = ("IN", "India")
 
+    is_incoming = random.choice([True, False])  # ✅ This fixes it
+
     packet = {
         "timestamp": timestamp,
         "src": src,
@@ -30,7 +32,7 @@ def generate_packet():
         "sport": random.randint(1000, 9999),
         "dport": random.randint(20, 443),
         "length": length,
-        "is_incoming": True,
+        "is_incoming": is_incoming,
         "country_src": country_src,
         "country_dst": country_dst,
         "country_code_src": country_code_src,
@@ -49,6 +51,7 @@ def generate_packet():
     live_packet_queue.append(packet)
     packet_data.append(packet)
     return packet
+
 
 def start_simulation():
     print("🚀 Simulated traffic generator started.")
