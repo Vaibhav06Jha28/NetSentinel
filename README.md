@@ -1,4 +1,3 @@
-
 # 🛰️ NetSentinel – Real-Time Network Traffic Analyzer & Threat Detector
 
 **NetSentinel** is a full-stack real-time network traffic analysis and threat detection system. Built using FastAPI, Scapy, WebSockets, and optional ML models, it captures, analyzes, and visualizes live network packets. GeoIP lookup, reverse DNS resolution, and alerting mechanisms make it ideal for cybersecurity monitoring and traffic profiling.
@@ -7,19 +6,20 @@
 
 ## 📌 Features
 
-- 📡 Real-time packet sniffing using **Scapy**
-- ⚠️ Rule-based Intrusion Detection System (IDS)
-- 🧠 ML-based anomaly detection using Isolation Forest
-- 🌍 GeoIP Lookup with country flags
-- 🔍 Reverse DNS and protocol detection
-- 📊 Live Dashboard:
-  - Incoming vs Outgoing traffic charts
-  - Protocol/port breakdown
-  - Top 5 IP talkers
-  - Country-based charts
-- 🔔 Live alerts with blinking badges and replay mode
-- 🌐 WebSocket-powered real-time updates
-- 🐳 Docker-ready backend (optional)
+* 📡 Real-time packet sniffing using **Scapy**
+* ⚠️ Rule-based Intrusion Detection System (IDS)
+* 🧠 ML-based anomaly detection using Isolation Forest
+* 🌍 GeoIP Lookup with country flags
+* 🔍 Reverse DNS and protocol detection
+* 📊 Live Dashboard:
+
+  * Incoming vs Outgoing traffic charts
+  * Protocol/port breakdown
+  * Top 5 IP talkers
+  * Country-based charts
+* 🔔 Live alerts with blinking badges and replay mode
+* 🌐 WebSocket-powered real-time updates
+* 🐳 Docker-ready backend (optional)
 
 ---
 
@@ -59,27 +59,118 @@ NetSentinel/
 
 ---
 
-## 🧠 Model Architecture (Optional)
+## 🧠 Model Architecture (Anomaly Detection + GeoIP)
 
-### 🔎 Isolation Forest (Scikit-learn)
+NetSentinel integrates a modular, multi-layered architecture combining real-time packet sniffing, machine learning–based anomaly detection, GeoIP analysis, and WebSocket-based UI updates.
 
-Used for detecting network anomalies based on behavioral patterns. The model is trained on features from normal traffic captured in `normal_traffic.csv`.
+### 🌍 1. GeoIP Lookup (MaxMind)
 
-- Input: Features extracted from packets
-- Output: `-1` (anomaly) or `1` (normal)
+* Maps external IPs to:
+
+  * Country name
+  * ISO code
+  * Coordinates
+* Powered by `GeoLite2-City.mmdb` placed in `data/`
+
+```python
+geo_reader = geoip2.database.Reader('data/GeoLite2-City.mmdb')
+```
+
+---
+
+### 🧠 2. ML-Based Anomaly Detection (Isolation Forest)
+
+* Trained on `normal_traffic.csv`
+* Scikit-learn Isolation Forest model
+* Output: `1` (normal), `-1` (anomaly)
+
+```python
+from sklearn.ensemble import IsolationForest
+model = IsolationForest()
+model.fit(normal_data)
+pred = model.predict(features)
+```
+
+Model saved as `models/isolation_model.pkl`
+
+---
+
+### ⚠️ 3. Rule-Based IDS (Always-On)
+
+* Detects:
+
+  * Suspicious ports
+  * External traffic to internal IPs
+  * DNS tunneling & malformed HTTP
+
+Defined in `app/ids.py`
+
+---
+
+### 🔁 4. Packet Sniffer
+
+* Scapy-based live capture:
+
+  * TCP / UDP / ICMP / DNS / HTTP
+
+```python
+from scapy.all import sniff, IP, TCP, UDP, DNS
+```
+
+---
+
+### 🌐 5. WebSocket Live Dashboard
+
+* FastAPI backend, frontend updates via WebSocket
+* Sends:
+
+  * Packet metadata
+  * GeoIP info
+  * Threat alerts
+
+---
+
+### 🧪 6. Simulated Traffic Generator
+
+* Generates test traffic (TCP/UDP)
+* Useful for testing live graphs & detection
+
+```bash
+python simulate_traffic.py
+```
+
+---
+
+### 🔌 Architecture Flow
+
+```
+Network
+  ↓
+Sniffer (Scapy)
+  ↓
+GeoIP Lookup
+  ↓            ↓
+Rule Engine   ML Detector (Isolation Forest)
+  ↓
+Threat/Normal?
+  ↓
+WebSocket Push
+  ↓
+Live Dashboard (JS/HTML)
+```
 
 ---
 
 ## 🧠 Tech Stack & Tools Used
 
-| Layer         | Technology / Tool     |
-|---------------|------------------------|
-| Packet Capture| Scapy                  |
-| Backend API   | FastAPI, WebSocket     |
-| Anomaly Model | Isolation Forest (sklearn) |
-| GeoIP Lookup  | MaxMind GeoLite2       |
-| Frontend      | HTML, JavaScript, Chart.js |
-| Deployment    | Docker (optional)      |
+| Layer          | Technology / Tool          |
+| -------------- | -------------------------- |
+| Packet Capture | Scapy                      |
+| Backend API    | FastAPI, WebSocket         |
+| Anomaly Model  | Isolation Forest (sklearn) |
+| GeoIP Lookup   | MaxMind GeoLite2           |
+| Frontend       | HTML, JavaScript, Chart.js |
+| Deployment     | Docker (optional)          |
 
 ---
 
@@ -107,7 +198,7 @@ pip install -r requirements.txt
 
 ### 4️⃣ Place GeoIP database
 
-Download **GeoLite2-City.mmdb** from MaxMind  
+Download **GeoLite2-City.mmdb** from MaxMind
 Place it in the `data/` directory
 
 ### 5️⃣ (Optional) Retrain ML model
@@ -124,8 +215,8 @@ python ml_model/train_model.py
 uvicorn main:app --reload
 ```
 
-Open your browser at:  
-**http://localhost:8000/static/dashboard.html**
+Open your browser at:
+**[http://localhost:8000/static/dashboard.html](http://localhost:8000/static/dashboard.html)**
 
 ---
 
@@ -146,7 +237,7 @@ python test.py
 
 ## 🌐 WebSocket Info
 
-**Live packet stream:**  
+**Live packet stream:**
 `ws://localhost:8000/ws/live`
 
 Sample Output:
@@ -177,34 +268,34 @@ Edit `docker-compose.yml` for port/mount settings.
 
 ## 🖼️ Demo Screenshots
 
-- 📊 Real-time dashboard (incoming/outgoing)
-- 🧠 ML anomaly detection
-- 🌍 Country-wise GeoIP chart
-- 🔔 Alerts & top IP stats
+* 📊 Real-time dashboard (incoming/outgoing)
+* 🧠 ML anomaly detection
+* 🌍 Country-wise GeoIP chart
+* 🔔 Alerts & top IP stats
 
-_(Add images in `static/assets/` and embed here)_
+*(Add images in `static/assets/` and embed here)*
 
 ---
 
 ## ✨ Future Improvements
 
-- 🌐 User authentication & login roles
-- 📦 MongoDB/Redis integration for packet logs
-- 📉 Replay traffic viewer
-- ☁️ Cloud-based visualization (Render/GCP)
-- 🔁 Live packet replay / export to CSV
+* 🌐 User authentication & login roles
+* 📦 MongoDB/Redis integration for packet logs
+* 📉 Replay traffic viewer
+* ☁️ Cloud-based visualization (Render/GCP)
+* 🔁 Live packet replay / export to CSV
 
 ---
 
 ## 👨‍💻 Developed By
 
-**Vaibhav Jha**  
-Final-Year Computer Engineering Student  
-🔗 [LinkedIn](https://www.linkedin.com/in/vaibhav-jha)  
+**Vaibhav Jha**
+Final-Year Computer Engineering Student
+🔗 [LinkedIn](https://www.linkedin.com/in/vaibhav-jha-27191b1ba/)
 ⭐ Star this repo if it helped you!
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
